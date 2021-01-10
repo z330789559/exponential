@@ -1,0 +1,57 @@
+//!
+//! The 'exponential' contract entry.
+//!
+
+use carefull_math::MathError;
+use carefull_math::CarefulMath;
+use exponential_no_error::Exp;
+use exponential_no_error::EXPSCALE;
+use exponential_no_error::ExponentialNoError;
+/**
+ * @title Exponential module for storing fixed-precision decimals
+ * @author keivn
+ * @dev Legacy contract for compatibility reasons with existing contracts that still use MathError
+ * @notice Exp is a struct which stores decimals with a fixed precision of 18 decimal places.
+ *         Thus, if we wanted to store the 5.1, mantissa would store 5.1e18. That is:
+ *         `Exp({mantissa: 5100000000000000000})`.
+ */
+contract Exponential {
+    pub  carefull_math: CarefulMath;
+    pub  exponential_no_error: ExponentialNoError;
+
+
+    pub fn new(_carefull_math:CarefulMath,_exponential_no_error:ExponentialNoError) -> Self {
+        Self {
+            carefull_math: _carefull_math,
+            exponential_no_error: _exponential_no_error,
+        }
+    }
+/**
+     * @dev Creates an exponential from numerator and denominator values.
+     *      Note: Returns an error if (`num` * 10e18) > MAX_INT,
+     *            or if `denom` is zero.
+     */
+pub fn get_exp(self,num:u248,denom:u248) ->(MathError, Exp) {
+        let (err0,scaledNumerator) = self.carefull_math.mulUInt(num, EXPSCALE);
+        if (err0 != MathError::NO_ERROR) {
+           (err0, Exp{mantissa: 0 as u248})
+        }else{
+            let (err1,rational) = self.carefull_math.divUInt(scaledNumerator, denom);
+            if (err1 != MathError::NO_ERROR) {
+                (err1, Exp{mantissa: 0 as u248})
+            }else{
+                (MathError::NO_ERROR, Exp{mantissa: rational})
+            }
+         }
+    }
+
+}
+
+#[test]
+fn test_getExp(){
+    let _careFull=CarefulMath::new(20);
+    let _exponential_no_error=ExponentialNoError::new(20);
+    let _contract=Exponential::new(_careFull,_exponential_no_error);
+    // let c=_contract.getExp(3 as u248,2 as u248);
+
+}
