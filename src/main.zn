@@ -32,26 +32,39 @@ contract Exponential {
      *            or if `denom` is zero.
      */
 pub fn get_exp(self,num:u248,denom:u248) ->(MathError, Exp) {
-        let (err0,scaledNumerator) = self.carefull_math.mulUInt(num, EXPSCALE);
-        if (err0 != MathError::NO_ERROR) {
-           (err0, Exp{mantissa: 0 as u248})
-        }else{
-            let (err1,rational) = self.carefull_math.divUInt(scaledNumerator, denom);
-            if (err1 != MathError::NO_ERROR) {
-                (err1, Exp{mantissa: 0 as u248})
-            }else{
-                (MathError::NO_ERROR, Exp{mantissa: rational})
-            }
-         }
+        dbg!("{},{}",num,denom);
+        let (err0,scaledNumerator):(MathError,u248) = self.carefull_math.mulUInt(num, EXPSCALE);
+        require(err0 == MathError::NO_ERROR,"get_exp mulUInt error");
+        let (err1,rational) = self.carefull_math.divUInt(scaledNumerator, denom);
+        require(err1 == MathError::NO_ERROR,"get_exp divUInt error");
+        (err1, Exp{mantissa: rational})
+}
+ /**
+    * @dev Adds two exponentials, returning a new exponential.
+    */
+pub fn add_exp(self,a:Exp,b:Exp)->(MathError, Exp) {
+        let (error,result) = self.carefull_math.addUInt(a.mantissa, b.mantissa);
+         (error, Exp{mantissa: result})
+    }
+
+
+ /**
+     * @dev Subtracts two exponentials, returning a new exponential.
+     */
+pub fn sub_exp(self,a:Exp,b:Exp)->(MathError, Exp) {
+      let  (error, result) = self.carefull_math.subUInt(a.mantissa, b.mantissa);
+       (error, Exp{mantissa: result})
     }
 
 }
+
+
 
 #[test]
 fn test_getExp(){
     let _careFull=CarefulMath::new(20);
     let _exponential_no_error=ExponentialNoError::new(20);
     let _contract=Exponential::new(_careFull,_exponential_no_error);
-    // let c=_contract.getExp(3 as u248,2 as u248);
+    let c=_contract.get_exp(3 as u248,2 as u248);
 
 }

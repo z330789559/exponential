@@ -1,7 +1,7 @@
 {
   "type": "contract",
   "storages": {
-    "0x0000000000000000000000000000000000000000": [
+    "0x0": [
       "0x0",
       [],
       {
@@ -23,12 +23,28 @@
     "amount": "0"
   },
   "arguments": {
+    "sub_exp": {
+      "a": {
+        "mantissa": "20"
+      },
+      "b": {
+        "mantissa": "10"
+      }
+    },
     "new": {
       "value": "0"
     },
     "get_exp": {
       "num": "0",
       "denom": "0"
+    },
+    "add_exp": {
+      "a": {
+        "mantissa": "0"
+      },
+      "b": {
+        "mantissa": "0"
+      }
     }
   }
 }
